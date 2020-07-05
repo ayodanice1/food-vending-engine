@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     #'menu',
     #'notification',
     #'order',
-    #'user',
+    'user',
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.admin',
@@ -108,9 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    #'DEFAULT_PERMISSION_CLASSES': (
-    #    'rest_framework.permissions.IsAuthenticated',
-    #)
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
 
 
