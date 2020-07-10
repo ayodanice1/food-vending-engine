@@ -14,7 +14,7 @@ class UserCreate(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 class UserList(generics.ListAPIView):
-    #permission_classes = ( permissions.IsAdminUser, )
+    permission_classes = ( permissions.IsAdminUser, )
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -44,9 +44,9 @@ class Profile(APIView):
         if not profile:
             profile = self._getProfile(VendorProfile, user)
             if not profile:
-                data['detail'] = 'No profile found. Create one.'
-                return Response(data)
-            data = VendorProfileSerializer(profile).data
+                data['detail'] = 'No profile found... create one.'
+            else:
+                data = VendorProfileSerializer(profile).data
         else:
             data = CustomerProfileSerializer(profile).data
         return Response(data)
