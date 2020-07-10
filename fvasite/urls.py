@@ -25,6 +25,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', obtain_auth_token),
     path('api/', include('menu.urls')),
+    path('api/', include('notification.urls')),
     path('api/', include('user.urls')),
     path('api/', include('order.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
