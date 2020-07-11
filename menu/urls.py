@@ -5,10 +5,8 @@ from .api import apiviews
 
 
 urlpatterns = [
-    path('menus/', apiviews.MenuList.as_view()),
-    path('menus/<str:pk>/', apiviews.MenuDetail.as_view()),
-    path('menus/<str:pk>/modify/', apiviews.ModifyMenu.as_view()),
-    path('menus/add/', apiviews.createMenu),
+    path('menus/', apiviews.MenuList.as_view(), name='menus_list'),
+    path('menus/<str:pk>/', apiviews.MenuDetail.as_view(), name='menus_detail'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

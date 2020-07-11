@@ -19,12 +19,15 @@ class UserList(generics.ListAPIView):
     serializer_class = UserSerializer
 
 class CustomerList(generics.ListAPIView):
+    permission_classes = ( permissions.IsAdminUser, )
     queryset = CustomerProfile.objects.all()
     serializer_class = CustomerProfileSerializer
 
 class VendorList(generics.ListAPIView):
+    permission_classes = ( permissions.IsAdminUser, )
     queryset = VendorProfile.objects.all()
     serializer_class = VendorProfileSerializer
+
 
 class Profile(APIView):
     
@@ -33,8 +36,7 @@ class Profile(APIView):
             profile = profile_model.objects.get(user=user)
         except profile_model.DoesNotExist:
             return
-        else:
-            return profile
+        return profile
 
     # View a profile
     def get(self, request):
