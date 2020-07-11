@@ -24,3 +24,8 @@ class Notification(models.Model):
     def __str__(self):
         return f"{self.subject} ({self.message_status})"
     
+    def save(self, *args, **kwargs):
+        if self.sender == self.receiver:
+            return 'Cannot send notification to self'
+        else:
+            super().save(*args, **kwargs)

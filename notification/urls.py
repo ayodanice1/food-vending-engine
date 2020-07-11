@@ -5,5 +5,5 @@ from .api import apiviews
 
 urlpatterns = [
     path('notifications/', apiviews.NotificationList.as_view()),
-    path('notifications/<int:pk>/', apiviews.NotificationDetail.as_view()),
+    path('notifications/<slug:pk>/', apiviews.NotificationDetail.as_view()),
 ]

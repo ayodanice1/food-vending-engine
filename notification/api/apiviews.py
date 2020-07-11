@@ -1,38 +1,24 @@
-from django.shortcuts import get_object_or_404, render
-from django.core.exceptions import PermissionDenied
-
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
+from django.shortcuts import get_object_or_404, render
+from django.core.exceptions import PermissionDenied
 
-from .serializers import NotificationSerializer
+from user.user_model.user import User
 
 from ..models import Notification
 from .serializers import NotificationSerializer
 
-from user.user_model.user import User
 
-
-
-class NotificationList(APIView):
+class NotificationList(generics.ListCreateAPIView):
+    serializer_class = NotificationSerializer
     
-    def get(self, request):
-        notifications = Notification.objects.filter(sender=request.user)
-        if not notifications:
-            notifications = Notification.objects.filter(receiver=request.user)
-        data = NotificationSerializer(notifications, many=True).data
-        return Response(data)
-    
-    def post(self, request):
-        receiver = User.objects.get(email=request.data['receiver'])
-        notification = Notification.objects.create(
-            sender=request.user,
-            receiver=receiver,
-            subject=request.data['subject'],
-            body=request.data['body'],
-        )
-        return Response({ 'detail': 'notification sent'})
-
+    def get_queryset(self):
+        queryset = Notification.objects.filter(sender=self.request.user)
+        if not queryset:
+            queryset = Notification.objects.filter(receiver=self.request.user)
+        return queryset
 
 class NotificationDetail(APIView):
 
@@ -45,6 +31,8 @@ class NotificationDetail(APIView):
         elif notification.sender == request.user:
             data = NotificationSerializer(notification).data
         else:
-            data['detail'] = 'permission denied' 
+            raise PermissionDenied 
         return Response(data)
 
+    def delete(self, request, pk):
+        return Response({ 'detail': 'Still working on notification deletion.' })
