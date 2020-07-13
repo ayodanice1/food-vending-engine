@@ -20,8 +20,11 @@ class OrderItem(models.Model):
         return float(self.item.price) * int(self.quantity)
     
     def save(self, *args, **kwargs):
+        if self.item.vendor != self.order.vendor:
+            return
         self.order_cost = self._set_order_cost()
         self.order.total_order_cost = float(self.order.total_order_cost) + self._set_order_cost()
+        self.order.outstanding = self.order.total_order_cost
         self.order.save()
         super().save(*args, **kwargs)
 

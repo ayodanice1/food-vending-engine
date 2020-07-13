@@ -3,7 +3,9 @@ from .api import apiviews
 
 
 urlpatterns = [
-    path('orders/', apiviews.OrderList.as_view()),
-    path('orders/<str:pk>/', apiviews.OrderDetail.as_view()),
-    path('orders/<str:pk>/checkout/', apiviews.OrderCheckout.as_view()),
+    path('orders/', apiviews.OrderList.as_view(), name='orders_list'),
+    path('orders/<slug:pk>/', apiviews.OrderDetail.as_view(), name='orders_detail'),
+    path('orders/<slug:pk>/items/', apiviews.OrderItems.as_view(), name='orderitems_list'),
+    path('orders/<slug:pk>/items/<str:item_id>/', apiviews.OrderItemDetail.as_view(), name='orderitems_detail'),
+    path('orders/<str:pk>/checkout/', apiviews.OrderCheckout.as_view(), name='orders_checkout'),
 ]
