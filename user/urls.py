@@ -6,12 +6,12 @@ from .api import apiviews
 
 urlpatterns = [
     path('users/', apiviews.UserList.as_view()),
-    path('users/vendors/', apiviews.VendorList.as_view()),
-    path('users/vendors/<str:pk>/', apiviews.vendorDetail),
-    path('users/customers/', apiviews.CustomerList.as_view()),
-    path('users/customers/<str:pk>/', apiviews.customerDetail),
-    path('users/register/', apiviews.UserCreate.as_view()),
-    path('users/profile/', apiviews.Profile.as_view()),
+    path('vendors/', apiviews.VendorList.as_view()),
+    path('vendors/<str:pk>/', apiviews.vendorDetail),
+    path('customers/', apiviews.CustomerList.as_view()),
+    path('customers/<str:pk>/', apiviews.customerDetail),
+    path('auth/register/', apiviews.UserCreate.as_view()),
+    path('auth/profile/', apiviews.Profile.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

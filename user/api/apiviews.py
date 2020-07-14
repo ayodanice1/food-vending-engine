@@ -1,6 +1,6 @@
-from rest_framework import authentication, generics, permissions, status
-from rest_framework.views import APIView
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
 from ..user_model.user import User
@@ -28,7 +28,6 @@ class VendorList(generics.ListAPIView):
     queryset = VendorProfile.objects.all()
     serializer_class = VendorProfileSerializer
 
-
 class Profile(APIView):
     
     def _getProfile(self, profile_model, user):
@@ -46,9 +45,8 @@ class Profile(APIView):
         if not profile:
             profile = self._getProfile(VendorProfile, user)
             if not profile:
-                data['detail'] = 'No profile found... create one.'
-            else:
-                data = VendorProfileSerializer(profile).data
+                return Response({'detail': 'Profile empty.'}, status=status.HTTP_204_NO_CONTENT)
+            data = VendorProfileSerializer(profile).data
         else:
             data = CustomerProfileSerializer(profile).data
         return Response(data)
@@ -59,15 +57,17 @@ class Profile(APIView):
         if user.is_vendor:
             profile = VendorProfile.objects.create(
                 user=User.objects.get(pk=request.user.id),
-                business_name=request.data["business_name"])
-            profile.save()
+                business_name=request.data["business_name"]
+            )
+            data = VendorProfileSerializer(profile).data
         else:
             profile = CustomerProfile.objects.create(
                 user=User.objects.get(pk=request.user.id),
                 first_name=request.data["first_name"],
-                last_name=request.data["last_name"])
-            profile.save()
-        return self.get(request)
+                last_name=request.data["last_name"]
+            )
+            data = CustomerProfileSerializer(profile).data
+        return Response(data, status=status.HTTP_201_CREATED)
     
 @api_view(['GET'])
 def customerDetail(request, pk):
