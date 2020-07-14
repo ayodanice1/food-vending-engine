@@ -3,8 +3,10 @@ from datetime import date
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
+from django.db.models.aggregates import Sum
 
 from ..models.order import Order
 from ..models.orderitem import OrderItem
@@ -147,3 +149,23 @@ class OrderItemDetail(generics.RetrieveDestroyAPIView):
             return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
         return Response({ 'detail': 'Action failed.' }, status=status.HTTP_409_CONFLICT)
 
+
+@api_view(['GET'])
+def salesReportView(request, date_string):
+    user = request.user
+    data = {}
+    if not user.is_vendor:
+        raise PermissionDenied
+    vendor = User.objects.get(pk=user.id)
+    orders = Order.objects.filter(vendor=vendor, date_created=date_string)
+    if not orders:
+        return Response({'detail': 'No orders found.'}, status=status.HTTP_204_NO_CONTENT)
+    data['message'] = f'Sales Record for today, {date_string}'
+    data['number_of_orders'] = orders.count()
+    data['detail'] = [ 
+        orders.aggregate(Sum('total_order_cost')), 
+        orders.aggregate(Sum('amount_paid')), 
+        orders.aggregate(Sum('outstanding')),
+    ]
+    return Response(data)
+    
