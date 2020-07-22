@@ -1,0 +1,81 @@
+{% extends "profile.html" %}
+
+{% block title %} {{ user.email }} {% endblock title %}
+
+{% block main %}
+{% load static %}
+<div class="">
+    <div class="profile" style="margin-bottom: 2.0rem;">
+        <h1>Menus</h1>
+    </div>
+    <div class="row ">
+        <div class="col-sm-7">
+            <h3 style="border-bottom: thick grey dotted; padding-bottom: 0.5rem;">
+                All Menus ({{ menus | length }})
+            </h3>
+            {% for menu in menus %}
+            <div class="row" 
+                style="border-bottom: thin grey solid; background-color: beige; padding-top: 0.5rem;">
+                <div class="col-sm-2">
+                    <img src="{% static 'icons/location-food.svg' %}" />
+                </div>
+                <div class="col-sm-10">
+                    <h5><a href="/menus/{{menu.id}}/">{{ menu.name | title }}</a></h5>
+                    <p><b>PRICE: </b>{{ menu.quantity }} <em>for</em> NGN {{ menu.price }}</p>
+                    <p>{{ menu.description }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <li>No menus yet.</li>
+            {% endfor %}
+        </div>
+        <div class="col-sm-5">
+            <h4>Add New Menu</h4>
+            <form action="/menus/" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="control-label">Name:</label>
+                    <div class="">
+                        <input class="form-control" id="name" type="text" name="name" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="control-label">Description:</label>
+                    <div class="">
+                        <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity" class="control-label">Quantity:</label>
+                    <div class="">
+                        <input class="form-control" id="quantity" type="number" name="quantity" min="1" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="price" class="control-label">Price:</label>
+                    <div class="">
+                        <input class="form-control" id="price" type="text" name="price" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label ">Scheduled days:</label>
+                    <select multiple="" class="form-control" name="scheduled_days" required>
+                          <option value="1">Monday</option>
+                          <option value="2">Tuesday</option>
+                          <option value="3">Wednesday</option>
+                          <option value="4">Thursday</option>
+                          <option value="5">Friday</option>
+                          <option value="6">Saturday</option>
+                    </select>
+                    <span class="help-block">Hold down “Control”, or “Command” on a Mac, to select more than one.</span>
+                </div>
+                <div class="form-group">
+                    <div class="">
+                        <input type="submit" value="Add"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock main %}

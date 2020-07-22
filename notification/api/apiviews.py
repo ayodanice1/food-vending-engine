@@ -1,6 +1,7 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 
@@ -20,6 +21,7 @@ class NotificationList(generics.ListCreateAPIView):
         return queryset
 
 class NotificationDetail(APIView):
+    renderer_classes = ( JSONRenderer, )
 
     def get(self, request, pk):
         notification = get_object_or_404(Notification, pk=pk)

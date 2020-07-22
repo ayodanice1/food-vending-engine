@@ -26,7 +26,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomerProfile
-        fields = ( 'id', 'user', 'first_name', 'last_name', )
+        fields = ( 'id', 'user', 'first_name', 'last_name', 'outstanding', )
 
 class VendorProfileSerializer(serializers.ModelSerializer):
 

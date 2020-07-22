@@ -23,6 +23,9 @@ class Notification(models.Model):
     
     def __str__(self):
         return f"{self.subject} ({self.message_status})"
+
+    def get_absolute_url(self):
+        return reverse('NotificationDetailView', pk=[str(self.id)])
     
     def save(self, *args, **kwargs):
         if self.sender == self.receiver:

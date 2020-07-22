@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>FoodVendingApp - {% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'bootstrap-4.3.1/dist/css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'fva.css' %}">
+    </head>
+    <body class="clearfix">
+        <div class="header">
+            <div class="container">
+                <h1>FoodVendingApp</h1>
+            </div>
+        </div>
+        <ul class="nav nav-tabs-justified">
+            <li class="nav-link"><a href="/">Home</a></li>
+            <li class="nav-link"><a href="#">GitHub Repo</a></li>
+        </ul>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 fva-main">
+                    {% block main %}{% endblock %}
+                </div>
+                <div class="col-sm-3 offset-sm-1 fva-sidebar">
+                    {% block sidebar %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="container">
+                <p>The full API's documentation is available at
+                    <a href="https://github.com/ayodanice1">https://github.com/ayodanice1/food-vending-app.git</a>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

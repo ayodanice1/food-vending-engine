@@ -1,0 +1,32 @@
+{% extends "profile.html" %}
+
+{% block title %} {{ user.email }} {% endblock title %}
+
+{% block main %}
+{% load static %}
+<div class="">
+    <div class="profile" style="margin-bottom: 2.0rem;">
+        <h1>Order Item Detail</h1>
+    </div>
+    <div class="row ">
+        <div class="col-sm-8">
+            <h3 style="border-bottom: thick grey dotted; padding-bottom: 0.5rem;">
+                {{ id }}
+            </h3>
+            <p><b>Order ID: </b> {{ order }}</p>
+            <p><b>Menu Item: </b> {{ menuitem | title }}</p>
+            <p><b>Quantity: </b> {{ quantity }}</p>
+            <p><b>Order Cost: </b> {{ order_cost }}</p>
+        </div>
+        <div class="col-sm-4">
+            {% if not user.is_vendor %}
+            <h4>Actions</h4>
+            <form class="button-form" action="/orders/{{order}}/items/{{id}}/" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger">Remove Item</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock main %}

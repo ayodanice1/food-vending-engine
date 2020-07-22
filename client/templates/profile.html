@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+
+{% block title %} {{ user.email }} {% endblock title %}
+
+{% block main %}
+<div class="">
+    {% if detail != 'No Profile' %}
+    <div class="profile">
+        <h3>Profile: {{ business_name }} {{ first_name }} {{ last_name }}</h3>
+    </div>
+    <div class="row user-bar" style="margin-bottom: 2.0rem;">
+        {% if user.is_vendor %}
+        <div class="col-sm-4">
+            <p>Address:</p>
+        </div>
+        {% else %}
+        <div class="col-sm-4">
+            <p>Full name: {{ first_name | title }} {{ last_name | title }}</p>
+        </div>
+        <div class="col-sm-4">
+            <p>Outstanding: {{ outstanding }}</p>
+        </div>
+        {% endif %}
+    </div>
+    <div class="row">
+        {% if not user.is_vendor %}
+        <div class="col-sm-6">
+            <div>
+                <h4>Create New Order</h4>
+                <form action="/orders/" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="vendor" class="control-label">Vendor:</label>
+                        <div class="">
+                            <input class="form-control" id="vendor" type="text" name="vendor" placeholder="vendor@server.ext" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="due_day" class="control-label">Expected Due Day:</label>
+                        <div class="">
+                            <input class="form-control" id="due_day" type="date" name="due_day" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="">
+                            <input type="submit" value="Create" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <h4>Check An Order</h4>
+                <form action="/notifications/" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="vendor" class="control-label">Order:</label>
+                        <div class="">
+                            <input class="form-control" id="order" type="text" name="order" placeholder="Order ID" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="">
+                            <input type="submit" value="Check" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-sm-6">
+            <h4>Add New Menu</h4>
+            <form action="/menus/" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="control-label">Name:</label>
+                    <div class="">
+                        <input class="form-control" id="name" type="text" name="name" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="control-label">Description:</label>
+                    <div class="">
+                        <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity" class="control-label">Quantity:</label>
+                    <div class="">
+                        <input class="form-control" id="quantity" type="number" name="quantity" min="1" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="price" class="control-label">Price:</label>
+                    <div class="">
+                        <input class="form-control" id="price" type="text" name="price" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label ">
+                      Scheduled days:
+                    </label>
+                  <div class="">
+                    <select class="form-control" name="scheduled_days" multiple required>
+                          <option value="1">Monday</option>
+                          <option value="2">Tuesday</option>
+                          <option value="3">Wednesday</option>
+                          <option value="4">Thursday</option>
+                          <option value="5">Friday</option>
+                          <option value="6">Saturday</option>
+                    </select>
+                      <span class="help-block">Hold down “Control”, or “Command” on a Mac, to select more than one.</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <div class="">
+                        <input type="submit" value="Add"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+        <div class="col-sm-6">
+            <h4>Send Notifications</h4>
+            <form action="/notifications/" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="receiver" class="control-label">Receiver:</label>
+                    <div class="">
+                        <input class="form-control" id="receiver" type="text" name="receiver" placeholder="receiver@server.ext" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="subject" class="control-label">Subject:</label>
+                    <div class="">
+                        <input class="form-control" id="subject" type="text" name="subject" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="body" class="control-label">Notification Body:</label>
+                    <div class="">
+                        <textarea class="form-control" id="body" name="body" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="">
+                        <input type="submit" value="Send"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>        
+    {% else %}
+    <div class="profile">
+        <h3>Profile: Create Profile</h3>
+    </div>
+    <div class="container form">
+        <p style="color: brown;">Only vendors are required to fill in their business names: a business name per vendor.
+        Customers are required to fill in just their first and last names.</p>
+        <form action="/users/profile/" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="business_name" class="col-sm-3 control-label">Business Name:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="business_name" type="text" name="business_name" placeholder="For Vendors only." />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="first_name" class="col-sm-3 control-label">First Name:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="first_name" type="text" name="first_name" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="last_name" class="col-sm-3 control-label">Last Name:</label>
+                <div class="col-sm-9">
+                    <input class="form-control" id="last_name" type="text" name="last_name" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <input type="submit" value="Create"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock main %}
+
+{% block sidebar %}
+<div class="profile-brief">
+    <div>
+        <img alt="user-avatar.jpg"/>
+    </div>
+    <div>
+        <h4>{{ first_name }} {{ last_name }} {{ business_name }}</h4>
+        <p><b>Email:</b> {{ user.email }}</p>
+        <p><b>Phone:</b> {{ user.phone_number }}</p>
+    </div>
+</div>
+<div class="user-actions">
+    <p><a class="" href="/orders/">Orders</a></p>
+    <p><a class="" href="/notifications/">Notifications</a></p>
+    {% if user.is_vendor %}
+    <p><a class="" href="/menus/">View Menus</a></p>
+    <p><a class="" href="/sales/">Get today's sales</a></p>
+    {% endif %}
+</div>
+<div class="" style="padding-top: 1.0rem;">
+    <span class="badge badge-primary">
+        <a class="nav-link" href="/auth-logout/">Logout</a>
+    </span>
+</div>
+{% endblock sidebar %}

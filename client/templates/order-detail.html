@@ -1,0 +1,130 @@
+{% extends "profile.html" %}
+
+{% block main %}
+{% load static %}
+<div class="">
+    <div class="profile" style="margin-bottom: 2.0rem;">
+        <h1>Order Detail</h1>
+    </div>
+    <div class="row ">
+        <div class="col-sm-8">
+            <h3 style="border-bottom: thick grey dotted; padding-bottom: 0.5rem;">{{ id }}</h3>
+            <p><b>CUSTOMER:</b> {{ order_customer }}</p>
+            <p><b>VENDOR:</b> {{ order_vendor }}</p>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div>
+                        <p><b>Due Date: </b><br>{{ due_date }}</p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div>
+                        <p><b>Status: </b><br>{{ order_status }}</p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div>
+                        <p><b>Total Cost: </b><br>NGN {{ total_order_cost }}</p>
+                    </div>
+                </div>
+            </div>
+            {% for item in order_items %}
+            <div class="row container" 
+                style="border-bottom: thin grey solid; background-color: beige; padding-top: 0.5rem;">
+                <div class="col-sm-2">
+                    <img src="{% static 'icons/location-food.svg' %}" />
+                </div>
+                <div class="col-sm-10">
+                    <h5><a href="/orders/{{id}}/items/{{item.id}}/">{{ item.id }}</a></h5>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div>
+                                <p><b>Quantity: </b><br>{{ item.quantity }}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div>
+                                <p><b>Order Cost: </b><br>{{ item.order_cost }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <li>No item in the order yet.</li>
+            {% endfor %}
+        </div>
+        <div class="col-sm-4">
+            {% if user.is_vendor %}
+            <h4>Update Menu Info</h4>
+            <form action="/menus/{{id}}/" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="control-label">Name:</label>
+                    <div class="">
+                        <input class="form-control" id="name" type="text" name="name" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="quantity" class="control-label">Quantity:</label>
+                    <div class="">
+                        <input class="form-control" id="quantity" type="number" name="quantity" min="1" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="price" class="control-label">Price:</label>
+                    <div class="">
+                        <input class="form-control" id="price" type="text" name="price" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label ">
+                      Scheduled days:
+                    </label>
+                  <div class="">
+                    <select multiple="" class="form-control" name="scheduled_days">
+                          <option value="1">Monday</option>
+                          <option value="2">Tuesday</option>
+                          <option value="3">Wednesday</option>
+                          <option value="4">Thursday</option>
+                          <option value="5">Friday</option>
+                          <option value="6">Saturday</option>
+                    </select>
+                      <span class="help-block">Hold down “Control”, or “Command” on a Mac, to select more than one.</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <div class="">
+                        <input type="submit" value="Update" />
+                    </div>
+                </div>
+            </form>
+            {% else %}
+            <h4>Add Menu Item</h4>
+            <form action="/orders/{{id}}/" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="control-label ">Pick a menu item:</label>
+                    <select id="item" class="form-control" name="item" required>
+                        {% for menu in menus %}
+                          <option value="{{menu.id}}">{{menu.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quantity" class="control-label">Quantity:</label>
+                    <div class="">
+                        <input class="form-control" id="quantity" type="number" name="quantity" min="1" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="">
+                        <input type="submit" value="Add Item" />
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock main %}

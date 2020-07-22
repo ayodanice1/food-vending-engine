@@ -2,7 +2,7 @@ from datetime import date
 
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models.aggregates import Sum
@@ -102,7 +102,7 @@ class OrderItems(generics.ListCreateAPIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'detail': 'Action failed'}, status=status.HTTP_409_CONFLICT)
+        return Response({'detail': 'Item not  scheduled for the due date.'}, status=status.HTTP_409_CONFLICT)
         
 class OrderCheckout(generics.RetrieveUpdateAPIView):
     serializer_class = OrderSerializer
@@ -132,21 +132,23 @@ class OrderCheckout(generics.RetrieveUpdateAPIView):
         order.save()
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
             
-class OrderItemDetail(generics.RetrieveDestroyAPIView):
-    serializer_class = OrderSerializer
-    permission_classes = ( IsConcerned, )
-    queryset = Order.objects.all()
-
-    def delete(self, request, pk, item_id):
-        order = get_object_or_404(Order, pk=pk)
-        orderitem = get_object_or_404(OrderItem, pk=item_id)
+@api_view(['GET', 'DELETE'])
+@permission_classes([ IsConcerned,] )
+def orderItemDetail(request, pk, item_id):
+    order = get_object_or_404(Order, pk=pk)
+    orderitem = get_object_or_404(OrderItem, pk=item_id)
+    if not order == orderitem.order:
+        return Response({ 'detail': 'Order and item are not related.'}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'GET':
+        return Response(OrderItemSerializer(orderitem).data, status=status.HTTP_200_OK)
+    if request.method == 'DELETE':
         if order.order_status in ('OPEN', 'PLACED'):
             order.total_order_cost = float(order.total_order_cost) - float(orderitem.order_cost)
             order.outstanding = order.total_order_cost
             order.save()
             orderitem.delete()
             return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
-        return Response({ 'detail': 'Action failed.' }, status=status.HTTP_409_CONFLICT)
+        return Response({ 'detail': 'Cannot remove item.' }, status=status.HTTP_409_CONFLICT)
 
 
 @api_view(['GET'])

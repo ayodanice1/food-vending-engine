@@ -1,0 +1,56 @@
+{% extends "profile.html" %}
+
+{% block main %}
+{% load static %}
+<div class="">
+    <div class="profile" style="margin-bottom: 2.0rem;">
+        <h1>Orders</h1>
+    </div>
+    <div class="row ">
+        <div class="col-sm-7">
+            <h3 style="border-bottom: thick grey dotted; padding-bottom: 0.5rem;">
+                All Orders ({{ orders | length }})
+            </h3>
+            {% for order in orders %}
+            <div class="row" 
+                style="border-bottom: thin grey solid; background-color: beige; padding-top: 0.5rem;">
+                <div class="col-sm-2">
+                    <img src="{% static 'icons/location-food.svg' %}" />
+                </div>
+                <div class="col-sm-10">
+                    <h5><a href="/orders/{{order.id}}/">{{ order.id }}</a> ({{ order.order_status }})</h5>
+                    <p><b>Total Order Cost: </b> NGN {{ order.total_order_cost }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>No menus yet.</p>
+            {% endfor %}
+        </div>
+        <div class="col-sm-5">
+            <div>
+                <h4>Create New Order</h4>
+                <form action="/orders/" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="vendor" class="control-label">Vendor:</label>
+                        <div class="">
+                            <input class="form-control" id="vendor" type="text" name="vendor" placeholder="vendor@server.ext" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="due_day" class="control-label">Expected Due Day:</label>
+                        <div class="">
+                            <input class="form-control" id="due_day" type="date" name="due_day" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="">
+                            <input type="submit" value="Create" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main %}

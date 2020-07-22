@@ -10,8 +10,8 @@ urlpatterns = [
     path('vendors/<str:pk>/', apiviews.vendorDetail),
     path('customers/', apiviews.CustomerList.as_view()),
     path('customers/<str:pk>/', apiviews.customerDetail),
-    path('auth/register/', apiviews.UserCreate.as_view()),
-    path('auth/profile/', apiviews.Profile.as_view()),
+    path('accounts/create/', apiviews.UserCreate.as_view()),
+    path('accounts/profile/', apiviews.Profile.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

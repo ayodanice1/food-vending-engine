@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %} Home {% endblock title %}
+
+{% block main %}
+    <h1>{{ detail }}</h1>
+    <p class='lead'>We establish a market place for food vendors to meet food buyers</p>
+    <p>The API's documentation is available at
+        <a href="https://github.com/ayodanice1">https://github.com/ayodanice1/food-vending-app.git</a>
+    </p>
+{% endblock main %}
+
+{% block sidebar %}
+    <div>
+        <p>New here?</p>
+        <p>
+            <span class="badge badge-primary">
+                <a class="nav-link" href="/create-login/">Create Login</a>
+            </span>
+        </p>
+        <p>
+            Login here:
+        </p>
+        <div class='side-login-form'>
+            <form action="/auth-login/" method="POST" >
+                {% csrf_token %}
+                <input type="text" name="email" placeholder="Email" style='margin-bottom: 1.0rem;' />
+                <input type="password" name="password" placeholder="Password" style='margin-bottom: 1.0rem;' />
+                <input type="submit" value='Login' />
+            </form>
+        </div>
+    </div>
+{% endblock sidebar %}

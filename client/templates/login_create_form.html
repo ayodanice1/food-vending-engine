@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %} LogIn Create {% endblock title %}
+
+{% block main %}
+<div class="container">
+    <div >
+        <h3>{{ detail }}</h3>
+    </div>
+    <form action="/create-login/" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="email" class="col-sm-3 control-label">Enter email:</label>
+            <div class="col-sm-9">
+                <input class="form-control" id="email" type="email" name="email" placeholder="example@server.org" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="phone_number" class="col-sm-3 control-label">Phone Number:</label>
+            <div class="col-sm-9">
+                <input class="form-control" id="phone_number" type="text" name="phone_number" placeholder="08012345678" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password" class="col-sm-3 control-label">Password:</label>
+            <div class="col-sm-9">
+                <input class="form-control" id="password" type="text" name="password" placeholder="Password" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-9 col-sm-offset-3">
+                <div class="radio">
+                    <label for="is_vendor">
+                        <input id="is_vendor" type="radio" name="is_vendor" /> Vendor?
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
+                <input type="submit" value="Create"/>
+            </div>
+        </div>
+    </form>        
+</div>
+{% endblock main %}
+
+{% block sidebar %}
+    <div>
+        <p>User: {{ user }}</p>
+        <p>
+            <span class="badge badge-primary">
+                <a class="nav-link" href="/">Cancel</a>
+            </span>
+        </p>
+        <p>
+            Login here:
+        </p>
+        <div class='side-login-form'>
+            <form action="/auth-login/" method="POST" >
+                <input type="text" name="email" placeholder="Email" style='margin-bottom: 1.0rem;' />
+                <input type="password" name="password" placeholder="Password" style='margin-bottom: 1.0rem;' />
+                <input type="submit" value='LOGIN' />
+            </form>
+        </div>
+    </div>
+{% endblock sidebar %}

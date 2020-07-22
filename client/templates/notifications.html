@@ -1,0 +1,66 @@
+{% extends "profile.html" %}
+
+{% block title %} {{ user.email }} {% endblock title %}
+
+{% block main %}
+{% load static %}
+<div class="">
+    <div class="profile" style="margin-bottom: 2.0rem;">
+        <h1>Notifications</h1>
+    </div>
+    <div class="row ">
+        <div class="col-sm-7">
+            <h3 style="border-bottom: thick grey dotted; padding-bottom: 0.5rem;">
+                All Notifications ({{ notifications | length }})
+            </h3>
+            {% for entry in notifications %}
+            <div class="row" 
+                style="border-bottom: thin grey solid; background-color: beige; padding-top: 0.5rem;">
+                <div class="col-sm-2">
+                    <img src="{% static 'icons/notifications-outline.svg' %}" />
+                </div>
+                <div class="col-sm-10">
+                    <h5>
+                        <a href="/notifications/{{entry.id}}/">
+                            <span>{{ entry.subject | title }}</span>
+                        </a> ({{ entry.message_status }})
+                    </h5>
+                    <p>{{ entry.body }} <br><span style="font-size: x-small;">{{ entry.time_created }}</span></p>
+                </div>
+            </div>
+            {% empty %}
+            <p>No notifications yet.</p>
+            {% endfor %}
+        </div>
+        <div class="col-sm-5">
+            <h4>Send Notifications</h4>
+            <form action="/notifications/" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="receiver" class="control-label">Receiver:</label>
+                    <div class="">
+                        <input class="form-control" id="receiver" type="text" name="receiver" placeholder="receiver@server.ext" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="subject" class="control-label">Subject:</label>
+                    <div class="">
+                        <input class="form-control" id="subject" type="text" name="subject" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="body" class="control-label">Notification Body:</label>
+                    <div class="">
+                        <textarea class="form-control" id="body" name="body" required></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="">
+                        <input type="submit" value="Send"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock main %}

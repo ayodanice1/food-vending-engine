@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/', include('notification.urls')),
     path('api/', include('user.urls')),
     path('api/', include('order.urls')),
+    path('', include('client.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

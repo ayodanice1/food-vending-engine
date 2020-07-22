@@ -1,7 +1,8 @@
 from rest_framework import generics, permissions, status
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
 
 from ..user_model.user import User
 from ..models import ( CustomerProfile, VendorProfile, )
@@ -29,6 +30,7 @@ class VendorList(generics.ListAPIView):
     serializer_class = VendorProfileSerializer
 
 class Profile(APIView):
+    renderer_classes = ( JSONRenderer, )
     
     def _getProfile(self, profile_model, user):
         try:
@@ -45,7 +47,8 @@ class Profile(APIView):
         if not profile:
             profile = self._getProfile(VendorProfile, user)
             if not profile:
-                return Response({'detail': 'Profile empty.'}, status=status.HTTP_204_NO_CONTENT)
+                data = { "detail": "Profile empty." }
+                return Response( data, status=status.HTTP_204_NO_CONTENT )
             data = VendorProfileSerializer(profile).data
         else:
             data = CustomerProfileSerializer(profile).data
@@ -70,6 +73,7 @@ class Profile(APIView):
         return Response(data, status=status.HTTP_201_CREATED)
     
 @api_view(['GET'])
+@renderer_classes([JSONRenderer])
 def customerDetail(request, pk):
     customer = CustomerProfile.objects.get(pk=pk)
     data = {
@@ -84,6 +88,7 @@ def customerDetail(request, pk):
     return Response(data)
 
 @api_view(['GET'])
+@renderer_classes([JSONRenderer])
 def vendorDetail(request, pk):
     vendor = VendorProfile.objects.get(pk=pk)
     data = {

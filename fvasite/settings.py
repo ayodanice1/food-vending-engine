@@ -25,19 +25,19 @@ SECRET_KEY = 'lg%3f5p+y_ehs-yzg-iv7@=8&3uz+!9393z!60d=ynx=!+&c&g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'client',
     'menu',
     'notification',
     'order',
     'user',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,7 +61,9 @@ ROOT_URLCONF = 'fvasite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,8 +139,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/static/'
-STATIC_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    STATIC_URL,
-]
+STATIC_ROOT = os.path.join(BASE_DIR, STATIC_URL)
