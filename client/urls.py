@@ -16,8 +16,10 @@ urlpatterns = [
     path('notifications/<slug:pk>/', notificationDetailView, name='notifications_detail'),
     path('orders/', ordersView, name='orders_list'),
     path('orders/<slug:pk>/', orderDetailView, name='orders_detail'),
+    path('orders/<slug:pk>/checkout/', orderCheckout, name='orders_checkout'),
+    path('orders/delete/<slug:pk>/', orderCancelDeleteView, name='ordercanceldelete_view'),
     path('orders/<slug:pk>/items/<slug:item_id>/', orderItemDetailView, name='orderitems_detail'),
-    #path('orders/<slug:pk>/items/delete/<slug:item_id>/', orderItemDelete, name='orderitems_delete'),
     path('menus/', menusView, name='menus_list'),
     path('menus/<slug:pk>/', menuDetailView, name='menus_detail'),
+    path('sales/', dailySalesView, name='dailysales_view'),
 ]

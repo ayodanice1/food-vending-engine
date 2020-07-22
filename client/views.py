@@ -1,14 +1,17 @@
 import requests
+from datetime import date
 from django.shortcuts import render, redirect
 from django.http.response import JsonResponse
 from django.views.generic import FormView
 from django.contrib.auth import authenticate, login, logout
+from django.db.models.aggregates import Sum
 from rest_framework import permissions
 from rest_framework.authtoken.views import Token
 from rest_framework.decorators import api_view, permission_classes
 
 from user.user_model.user import User
 from menu.models import Menu
+from order.models.order import Order
 from .forms import LoginForm
 
 
@@ -70,6 +73,9 @@ def profileView(request):
             context = { 'detail': 'No profile' }
         elif response.status_code == 200:
             context = response.json()
+            if not user.is_vendor:
+                orders = Order.objects.filter(customer=user)
+                context['outstanding'] = orders.aggregate(Sum('outstanding')).get('outstanding__sum')
             context['user'] = user
         return render(request, 'profile.html', context)
     elif request.method == 'POST':
@@ -79,7 +85,6 @@ def profileView(request):
         else:
             data = { 'first_name': request.POST.get('first_name'), 'last_name': request.POST.get('last_name'), }
             response = requests.post(url, data=data, headers=headers)
-        if response.status_code == 201:
             return redirect('/users/profile/')
         return render(request, '400.html', { 'error': response.json() })
 
@@ -119,8 +124,7 @@ def notificationDetailView(request, pk):
     if response.status_code == 404:
         return render(request, '404.html', {})
     elif response.status_code == 200:
-        sender = response.json()['sender']
-        sender_email = User.objects.get(pk=sender).email
+        sender_email = User.objects.get(pk=response.json()['sender']).email
         context = response.json()
         context['user'] = user
         context['sender_email'] = sender_email
@@ -192,8 +196,7 @@ def ordersView(request):
         return render(request, 'orders.html', context)
     elif request.method == 'POST':
         vendor = User.objects.get(email=request.POST.get('vendor'))
-        due_date = request.POST.get('due_day')
-        data = { 'customer': user.id, 'vendor': vendor.id, 'due_date': due_date }
+        data = { 'customer': user.id, 'vendor': vendor.id, 'due_date': request.POST.get('due_day') }
         response = requests.post(url, data=data, headers=headers)
         if response.status_code == 201:
             return redirect('/orders/')
@@ -218,16 +221,34 @@ def orderDetailView(request, pk):
         context['order_customer'] = customer.email
         context['order_vendor'] = vendor.email
         context['order_items'] = requests.get(url+'items/', headers=headers).json()
-        print(context)
         return render(request, 'order-detail.html', context)
     elif request.method == 'POST':
-        print(request.POST)
-        data = { 'order':pk, 'item':request.POST.get('item'), 'quantity':request.POST.get('quantity') }
-        response = requests.post(url+'items/', data=data, headers=headers)
-        print(response.json())
-        if response.status_code == 201:
-            return redirect(f'/orders/{pk}/')
-        return render(request, '400.html', {'detail': response.json()['detail']})
+        if user.is_vendor:
+            data = { 'order_status': request.POST.get('order_status') }
+            response = requests.put( url, data=data, headers=headers )
+            if response.status_code != 400:
+                return redirect(f'/orders/{pk}/')
+            return render(request, '400.html', {'detail': response.json()['detail']})
+        else:
+            data = { 'order':pk, 'item':request.POST.get('item'), 'quantity':request.POST.get('quantity') }
+            response = requests.post(url+'items/', data=data, headers=headers)
+            if response.status_code == 201:
+                return redirect(f'/orders/{pk}/')
+            return render(request, '400.html', {'detail': response.json()['detail']})
+
+@api_view([ 'POST' ])
+def orderCancelDeleteView(request, pk):
+    user = request.user
+    token = Token.objects.get(user=user)
+    headers = { 
+        'Authorization': f'Token {token}',
+        'Accept': 'application/json',
+    }
+    url = f'http://localhost:8000/api/orders/{pk}/'
+    response = requests.delete(url, headers=headers)
+    if response.status_code == 200:
+        return redirect('/orders/')
+    return render(request, '400.html', { 'detail': response.json() })
 
 @api_view(['GET', 'POST'])
 def orderItemDetailView(request, pk, item_id):
@@ -242,11 +263,40 @@ def orderItemDetailView(request, pk, item_id):
         response = requests.get(url, headers=headers)
         context = response.json()
         context['menuitem'] = Menu.objects.get(pk=response.json()['item']).name
-        print(context)
         return render(request, 'orderitem-detail.html', context)
     elif request.method == 'POST':
         response = requests.delete(url, headers=headers)
-        print(response.json())
         if response.status_code == 200:
             return redirect(f'/orders/{pk}/')
         return render(request, '400.html', {'detail': response.json()['detail']})
+
+@api_view(['POST'])
+def orderCheckout(request, pk):
+    user = request.user
+    token = Token.objects.get(user=user)
+    headers = { 
+        'Authorization': f'Token {token}',
+        'Accept': 'application/json',
+    }
+    url = f'http://localhost:8000/api/orders/{pk}/checkout/'
+    response = requests.post(url, data={'amount_paid': request.POST.get('amount_paid')}, headers=headers)
+    if response.status_code == 200:
+        return redirect(f'/orders/{pk}/')
+    return render(request, '400.html', {'detail': response.json()['detail']})
+
+@api_view(['GET'])
+def dailySalesView(request):
+    user = request.user
+    token = Token.objects.get(user=user)
+    headers = { 
+        'Authorization': f'Token {token}',
+        'Accept': 'application/json',
+    }
+    url = f'http://localhost:8000/api/sales/{date.today()}/'
+    response = requests.get(url, headers=headers)
+    context = response.json()
+    print(response.json())
+    if response.status_code == 200:
+        return render(request, 'daily-sales-report.html', context)
+    return render(request, '400.html', {'detail': response.json()['detail']})
+    

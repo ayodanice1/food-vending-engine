@@ -25,7 +25,13 @@
                             <span>{{ entry.subject | title }}</span>
                         </a> ({{ entry.message_status }})
                     </h5>
-                    <p>{{ entry.body }} <br><span style="font-size: x-small;">{{ entry.time_created }}</span></p>
+                    <p>
+                        {{ entry.body | capfirst }} 
+                        <br>
+                        <span style="font-size: x-small;">
+                            {{ entry.time_created }}
+                        </span>
+                    </p>
                 </div>
             </div>
             {% empty %}

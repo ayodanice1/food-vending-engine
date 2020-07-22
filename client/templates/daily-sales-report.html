@@ -1,0 +1,24 @@
+{% extends "profile.html" %}
+
+{% block main %}
+{% load static %}
+<div class="">
+    <div class="profile" style="margin-bottom: 2.0rem;">
+        <h1>Daily Sales Record</h1>
+    </div>
+    <div class="row ">
+        <div class="col-sm-7">
+            <h3 style="border-bottom: thick grey dotted; padding-bottom: 0.5rem;">
+                {{ message | title}}
+            </h3>
+            <p><b>NUMBER OF ORDERS:</b> {{ number_of_orders }}</p>
+            <p><b>REPORT IN DETAILS:</b></p>
+            {% for info in detail %}
+            <p>{{ info }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-sm-5" style="margin-bottom: 0.5rem;">
+        </div>
+    </div>
+</div>
+{% endblock main %}

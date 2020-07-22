@@ -17,8 +17,9 @@ ORDER_STATUS_CHOICES=(
     ('CANCELLED', 'Cancelled Ordered'), 
 )
 PAYMENT_STATUS_CHOICES=(
-    ('NYT', 'Not Yet Paid'), 
-    ('PAID', 'Fully Paid'), 
+    ('NYT', 'Not Yet Paid'),
+    ('PART', 'Partly Paid'), 
+    ('PAID', 'Fully Paid'),
 )
 
 class Order(models.Model):

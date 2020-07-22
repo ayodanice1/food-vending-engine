@@ -5,7 +5,7 @@
 
 {% block main %}
 <div class="">
-    {% if detail != 'No Profile' %}
+    {% if not detail %}
     <div class="profile">
         <h3>Profile: {{ business_name }} {{ first_name }} {{ last_name }}</h3>
     </div>
@@ -19,7 +19,7 @@
             <p>Full name: {{ first_name | title }} {{ last_name | title }}</p>
         </div>
         <div class="col-sm-4">
-            <p>Outstanding: {{ outstanding }}</p>
+            <p>Outstanding: NGN {{ outstanding | default:'0' }}.00</p>
         </div>
         {% endif %}
     </div>
@@ -45,23 +45,6 @@
                     <div class="form-group">
                         <div class="">
                             <input type="submit" value="Create" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div>
-                <h4>Check An Order</h4>
-                <form action="/notifications/" method="POST">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="vendor" class="control-label">Order:</label>
-                        <div class="">
-                            <input class="form-control" id="order" type="text" name="order" placeholder="Order ID" required />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="">
-                            <input type="submit" value="Check" />
                         </div>
                     </div>
                 </form>

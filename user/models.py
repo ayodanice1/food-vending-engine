@@ -33,7 +33,6 @@ class CustomerProfile(models.Model):
     user = models.OneToOneField( User, on_delete=models.CASCADE )
     first_name = models.CharField( max_length=150, blank=True, null=True )
     last_name = models.CharField( max_length=150, blank=True, null=True )
-    outstanding = models.DecimalField( max_digits=10, decimal_places=2, default=0.00 )
     
     class Meta:
         ordering = ['first_name']

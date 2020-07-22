@@ -15,9 +15,7 @@ class NotificationList(generics.ListCreateAPIView):
     serializer_class = NotificationSerializer
     
     def get_queryset(self):
-        queryset = Notification.objects.filter(sender=self.request.user)
-        if not queryset:
-            queryset = Notification.objects.filter(receiver=self.request.user)
+        queryset = Notification.objects.filter(receiver=self.request.user)
         return queryset
 
 class NotificationDetail(APIView):

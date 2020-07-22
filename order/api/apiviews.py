@@ -55,8 +55,10 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             raise PermissionDenied
         next_status = request.data.get('order_status')
         curr_status = order.order_status
+        if ( next_status and curr_status ) not in status_sequence:
+            return Response({'detail': 'Action failed.'}, status=status.HTTP_400_BAD_REQUEST)
         diff_in_sequence = status_sequence.index(next_status) - status_sequence.index(curr_status)
-        if ( not next_status in status_sequence ) or diff_in_sequence != 1:
+        if diff_in_sequence != 1:
             return Response({'detail': 'Action failed.'}, status=status.HTTP_400_BAD_REQUEST)
         order.order_status = next_status
         order.save()
@@ -69,13 +71,13 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
             raise PermissionDenied
         if order.order_status in ('OPEN', 'PLACED'):
             order.delete()
-            return Response({'detail': 'Action successful'})
+            return Response({'detail': 'Deleted'})
         elif order.order_status in ('PROCESSING', 'READY', 'RECEIVED'):
             order.outstanding = float(order.total_order_cost) * 0.4
             order.order_status = 'CANCEL'
             order.save()
             return Response(OrderSerializer(order).data)
-        return Response({'detail': 'Action failed'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Failed'}, status=status.HTTP_400_BAD_REQUEST)
 
 class OrderItems(generics.ListCreateAPIView):
     serializer_class = OrderItemSerializer
@@ -112,24 +114,40 @@ class OrderCheckout(generics.RetrieveUpdateAPIView):
     def post(self, request, pk):
         order = get_object_or_404(Order, pk=pk)
         outstanding = float(order.outstanding)
+        total_amount_paid = float(order.amount_paid)
         try:
             amount_paid = float(request.data.get('amount_paid'))
         except ValueError:
-            return Response({'detail': 'Action failed.'}, status=status.HTTP_402_PAYMENT_REQUIRED)
+            return Response({'detail': 'Payment required.'}, status=status.HTTP_402_PAYMENT_REQUIRED)
         if order.order_status == 'OPEN':
             if amount_paid < outstanding:
-                return Response({'detail': 'Action failed.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                order.payment_status = 'PART'
+            else:
+                order.payment_status = 'FULL'
+            order.outstanding = outstanding - amount_paid
+            order.amount_paid = total_amount_paid + amount_paid
             order.order_status = 'PLACED'
+            order.save()
         elif order.order_status == 'CANCEL':
             if amount_paid < outstanding:
-                return Response({'detail': 'Action failed.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response({'detail': 'Outstanding must be cleared.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            else:
+                order.payment_status = 'FULL'
+            order.outstanding = outstanding - amount_paid
+            order.amount_paid = total_amount_paid + amount_paid
             order.order_status = 'CANCELLED'
+            order.save()
+        elif order.order_status == 'CANCELLED':
+            return Response({'detail': 'Order has been cancelled.'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'detail': 'Action failed.'}, status=status.HTTP_409_CONFLICT)
-        order.outstanding = outstanding - amount_paid
-        order.amount_paid = amount_paid
-        order.payment_status = 'PAID'
-        order.save()
+            if amount_paid < outstanding:
+                order.payment_status = 'PART'
+            else:
+                order.payment_status = 'FULL'
+            order.outstanding = outstanding - amount_paid
+            order.amount_paid = total_amount_paid + amount_paid
+            order.order_status = 'PLACED'
+            order.save()
         return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
             
 @api_view(['GET', 'DELETE'])
@@ -149,7 +167,6 @@ def orderItemDetail(request, pk, item_id):
             orderitem.delete()
             return Response(OrderSerializer(order).data, status=status.HTTP_200_OK)
         return Response({ 'detail': 'Cannot remove item.' }, status=status.HTTP_409_CONFLICT)
-
 
 @api_view(['GET'])
 def salesReportView(request, date_string):
