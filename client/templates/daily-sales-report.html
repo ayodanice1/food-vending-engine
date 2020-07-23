@@ -13,8 +13,10 @@
             </h3>
             <p><b>NUMBER OF ORDERS:</b> {{ number_of_orders }}</p>
             <p><b>REPORT IN DETAILS:</b></p>
-            {% for info in detail %}
+            {% for info in record %}
             <p>{{ info }}</p>
+            {% empty %}
+            {{ detail }}
             {% endfor %}
         </div>
         <div class="col-sm-5" style="margin-bottom: 0.5rem;">

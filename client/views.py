@@ -82,6 +82,7 @@ def profileView(request):
         if user.is_vendor:
             data = { 'business_name': request.POST.get('business_name'), }
             response = requests.post(url, data=data, headers=headers)
+            return redirect('/users/profile/')
         else:
             data = { 'first_name': request.POST.get('first_name'), 'last_name': request.POST.get('last_name'), }
             response = requests.post(url, data=data, headers=headers)
@@ -175,8 +176,14 @@ def menuDetailView(request, pk):
         context['days'] = days
         return render(request, 'menu-detail.html', context)
     elif request.method == 'POST':
-        response = requests.put(url, data=request.POST, headers=headers)
-        if response.status_code == 201:
+        data = { 
+            'name': request.POST.get('name'), 'description': request.POST.get('description'),
+            'quantity': request.POST.get('quantity'), 'price': request.POST.get('price'),
+            'scheduled_days': request.POST.getlist('scheduled_days'), 'vendor': request.POST.get('vendor')
+        }
+        response = requests.put(url, data=data, headers=headers)
+        print(response.json())
+        if response.status_code == 200:
             return redirect('/menus/')
         return render(request, '400.html', {'error': response.json()})
 
@@ -294,9 +301,10 @@ def dailySalesView(request):
     }
     url = f'http://localhost:8000/api/sales/{date.today()}/'
     response = requests.get(url, headers=headers)
-    context = response.json()
-    print(response.json())
     if response.status_code == 200:
+        context = response.json()
         return render(request, 'daily-sales-report.html', context)
-    return render(request, '400.html', {'detail': response.json()['detail']})
+    elif response.status_code == 204:
+        return render(request, 'daily-sales-report.html', {'detail': 'No sales records yet.'})
+    return render(request, '400.html', {'detail': 'Server could not understand request.'})
     

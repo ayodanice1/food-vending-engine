@@ -180,7 +180,7 @@ def salesReportView(request, date_string):
         return Response({'detail': 'No orders found.'}, status=status.HTTP_204_NO_CONTENT)
     data['message'] = f'Sales Record for today, {date_string}'
     data['number_of_orders'] = orders.count()
-    data['detail'] = [ 
+    data['record'] = [ 
         orders.aggregate(Sum('total_order_cost')), 
         orders.aggregate(Sum('amount_paid')), 
         orders.aggregate(Sum('outstanding')),
